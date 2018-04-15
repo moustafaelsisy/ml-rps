@@ -1,0 +1,129 @@
+<!-- saved from url=(0043)http://www.cs.mun.ca/~dchurchill/html5/rps/ -->
+<!-- Modified Work Copyright 2018 Moustafa Elsisy -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252"><script type="text/javascript" src="./rps_files/rps.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.9.0"> </script>
+<style>
+table {
+    border-collapse: collapse;
+    font: 16px arial, sans-serif;
+}
+
+th, td {
+    text-align: center;
+    padding: 16px;
+}
+
+tr:nth-child(even){background-color: #f2f2f2}
+</style>
+</head>
+
+<body>
+
+Rock, Paper, Scissors!<br><br>
+
+Games: <input id="games" type="number" value="100"> 
+<button id="play" onclick="(async () => await PlayTournament())()">Play Tournament</button><br><br>
+
+<div id="table"></div>
+
+<script>
+
+// returns 0 if i wins, 1 if j wins, 2 if draw
+GetResult = function(i, j) {
+    if (i == 'r' && j == 'r') return 2;
+    if (i == 'r' && j == 's') return 0;
+    if (i == 'r' && j == 'p') return 1;
+    if (i == 's' && j == 'r') return 1;
+    if (i == 's' && j == 's') return 2;
+    if (i == 's' && j == 'p') return 0;
+    if (i == 'p' && j == 'r') return 0;
+    if (i == 'p' && j == 's') return 1;
+    if (i == 'p' && j == 'p') return 2;
+}
+
+GetScore = function(result) {
+    if(result[0]+result[1]+result[2] === 0)
+        return "-"
+
+    return ((result[0] + result[2]/2) / (result[0]+result[1]+result[2])).toFixed(3);
+}
+
+PlayTournament = async function() {
+
+    var players = [RPS_Rotate(), RPS_BeatPrevious(),
+                   RPS_Probability(), RPS_Conditional(), RPS_Learner(), RPS_Learner2(), RPS_NN()];
+    var games = document.getElementById("games").value;
+    
+    // make the array that will store the results
+    var results = [];
+    for (var i=0; i<players.length; i++) {
+        results[i] = [];
+        for (var j=0; j<players.length; j++) {
+            // each element of the result matrix is [win, lose, draw]
+            results[i][j] = [0, 0, 0];
+        }
+    }
+    
+    var totals = [];
+    for (var i=0; i<players.length; i++) {
+        totals[i] = [0, 0, 0];
+    }
+    
+    // play the round robin tournament
+    for (var i=0; i<players.length; i++) {
+        for (var j=0; j<players.length; j++) {
+
+            if(i === j){
+                continue
+            }
+            
+            var result = [0, 0, 0];
+            var iHistory = [];
+            var jHistory = [];
+            
+            for (var g=0; g<games; g++) {
+                var iChoice = await players[i].choose(iHistory, jHistory);
+                var jChoice = await players[j].choose(jHistory, iHistory);
+                iHistory[g] = iChoice;
+                jHistory[g] = jChoice;
+                result[GetResult(iChoice, jChoice)] += 1;
+            }
+            
+            results[i][j] = result;
+            
+            if (i != j) {
+                totals[i][0] += result[0];
+                totals[i][1] += result[1];
+                totals[i][2] += result[2];
+            }
+        }
+    }
+    
+    // form the table of results
+    var table = "<table><tr><td></td>";
+    for (var i=0; i<players.length; i++) { 
+        table += "<td><b>" + players[i].name + "</b></td>";
+    }
+    table += "<td><b>Total</b></td></tr>";
+    
+    for (var i=0; i<players.length; i++) {
+        table += "<tr><td><b>" + players[i].name + "</b></td>";
+        for (var j=0; j<players.length; j++) {
+
+            var score = GetScore(results[i][j]);
+            table += "<td>" + score + "</td>";
+        }
+        table += "<td>" + GetScore(totals[i]) + "</td></tr>\n";
+    }
+    table += "</table>"
+    
+    document.getElementById("table").innerHTML = table;
+}
+
+</script>
+
+
+
+
+</body></html>
