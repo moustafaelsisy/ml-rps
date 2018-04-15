@@ -65,10 +65,3 @@ class NN:
 
         self._train(enemyHistory, selfHistory)
         return self._predict(enemyHistory, selfHistory)
-
-
-def main():
-    nn = NN()
-    nn.choose(4*["r"], 4*["s"])
-
-main()
