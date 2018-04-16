@@ -1,6 +1,7 @@
 import numpy as np
 from tensorflow.contrib import keras
 from functools import reduce
+import math
 
 class NN:
     """
@@ -11,6 +12,8 @@ class NN:
     6*3 neurons in the input layer (one-hot encoding of previous moves)
     No hidden layers
     3 neuron softmax output layer (one-hot encoding of prediction)
+
+    +Exponential learning rate decay
     """
 
     def __init__(self):
@@ -49,7 +52,10 @@ class NN:
         lastEnemyMove = enemyHistory[-1]
         y = self._oneHot(self.opposing[lastEnemyMove])
 
-        self.model.fit(np.array([x]), np.array([y]), epochs=3)
+        iteration = len(enemyHistory) - 4
+        learningRate = 0.1*math.exp(-iteration/6)+0.001 #max at 0.1, min at 0.001
+        self.model.optimizer.lr.assign(learningRate)
+        self.model.fit(np.array([x]), np.array([y]), epochs=1)
 
     def _predict(self, enemyHistory, selfHistory):
         predictionOffsets = [1,2,3]
