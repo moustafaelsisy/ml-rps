@@ -1,5 +1,6 @@
 from nn import NN
 from beatPrevious import BeatPrevious
+from rotate import Rotate
 
 def getResult(selfMove, enemyMove):
     """
@@ -21,10 +22,9 @@ def getScore(result):
     if(sum(result) == 0): #no rounds were played
         return "-"
 
-    return "{:.2f}".format((result[0] + result[2]/2) / (sum(result)))
+    return "{:.3f}".format((result[0] + result[2]/2) / (sum(result)))
 
-def playTournament(numOfGames=10):
-    players = [NN(), BeatPrevious()]
+def playTournament(players, numOfGames=10):
     results = [[3*[0] for _ in range(len(players))] for _ in range(len(players))]
     totals = [3*[0] for _ in range(len(players))]
 
@@ -39,7 +39,7 @@ def playTournament(numOfGames=10):
 
             for _ in range(numOfGames):
                 iChoice = players[i].choose(iHistory, jHistory)
-                jChoice = players[j].choose(iHistory, jHistory)
+                jChoice = players[j].choose(jHistory, iHistory)
                 iHistory.append(iChoice)
                 jHistory.append(jChoice)
                 result[getResult(iChoice, jChoice)] += 1
@@ -56,6 +56,6 @@ def playTournament(numOfGames=10):
     print(totalScores)
 
 def main():
-    playTournament(100)
+    playTournament(numOfGames=200, players=[NN(), Rotate(), BeatPrevious()])
 
 main()
