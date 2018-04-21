@@ -2,6 +2,7 @@ from nn import NN
 from beatPrevious import BeatPrevious
 from rotate import Rotate
 from probability import Probability
+from conditional import Conditional
 
 def getResult(selfMove, enemyMove):
     """
@@ -57,6 +58,6 @@ def playTournament(players, numOfGames=10):
     print(totalScores)
 
 def main():
-    playTournament(numOfGames=200, players=[NN(), Rotate(), BeatPrevious(), Probability()])
+    playTournament(numOfGames=200, players=[NN(), Rotate(), BeatPrevious(), Probability(), Conditional()])
 
 main()
