@@ -13,7 +13,6 @@ class NN:
     No hidden layers
     3 neuron softmax output layer (one-hot encoding of prediction)
 
-    +Exponential learning rate decay
     """
 
     def __init__(self):
@@ -23,7 +22,7 @@ class NN:
     def _generateModel(self):
         model = keras.models.Sequential()
         model.add(keras.layers.Dense(units=3, input_shape=[6*3], activation="softmax"))
-        optimizer = keras.optimizers.SGD(lr=0.1)
+        optimizer = keras.optimizers.SGD(lr=0.4)
         model.compile(optimizer=optimizer, loss="categorical_crossentropy")
         return model
 
@@ -51,10 +50,6 @@ class NN:
 
         lastEnemyMove = enemyHistory[-1]
         y = self._oneHot(self.opposing[lastEnemyMove])
-
-        iteration = len(enemyHistory) - 4
-        learningRate = 0.1*math.exp(-iteration/6)+0.001 #max at 0.1, min at 0.001
-        self.model.optimizer.lr.assign(learningRate)
         self.model.fit(np.array([x]), np.array([y]), epochs=1)
 
     def _predict(self, enemyHistory, selfHistory):
