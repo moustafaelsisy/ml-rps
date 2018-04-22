@@ -4,6 +4,9 @@ from rotate import Rotate
 from probability import Probability
 from conditional import Conditional
 
+import pandas as pd
+import numpy as np
+
 def getResult(selfMove, enemyMove):
     """
     Returns the result's code (0 for win, 1 for loss, 2 for draw)
@@ -50,12 +53,14 @@ def playTournament(players, numOfGames=10):
             for resultIndex in range(3):
                 totals[i][resultIndex] += result[resultIndex]
 
-    resultScores = [[getScore(result) for result in row] for row in results]
-    totalScores = [getScore(total) for total in totals]
+    resultScores = np.array([[getScore(result) for result in row] for row in results])
+    totalScores = np.array([getScore(total) for total in totals]).reshape(-1, len(totals))
+    titles = [player.__class__.__name__ for player in players]
 
-    print(resultScores)
+    print("\nResults table: ")
+    print(pd.DataFrame(resultScores, columns=titles, index=titles), end="\n\n")
     print("Totals:")
-    print(totalScores)
+    print(pd.DataFrame(totalScores, columns=titles, index=[""]))
 
 def main():
     playTournament(numOfGames=200, players=[NN(), Rotate(), BeatPrevious(), Probability(), Conditional()])
