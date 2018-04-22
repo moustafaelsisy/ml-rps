@@ -50,7 +50,7 @@ class NN:
 
         lastEnemyMove = enemyHistory[-1]
         y = self._oneHot(self.opposing[lastEnemyMove])
-        self.model.fit(np.array([x]), np.array([y]), epochs=1)
+        self.model.fit(np.array([x]), np.array([y]), epochs=1, verbose=0)
 
     def _predict(self, enemyHistory, selfHistory):
         predictionOffsets = [1,2,3]
